@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartPay - লগইন ও স্পিন</title>
+    <title>SmartPay - লাকি স্পিন</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -12,44 +12,60 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --white: #ffffff; --text: #0f172a; }
+        :root { --primary: #2563eb; --bg: #f8fafc; --white: #ffffff; --text: #0f172a; --danger: #ef4444; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        /* Login Screen Styles */
+        /* Login Screen */
         #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
         .login-box { background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; }
         .login-box h2 { text-align: center; margin-bottom: 25px; color: var(--primary); }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
         .input-group input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 16px; outline: none; }
-        .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; }
 
-        /* Spin Screen Styles */
+        /* Spin Screen */
         #spinScreen { display: none; }
 
+        /* Top User Bar */
+        .top-user-bar { background: var(--white); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .user-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #64748b; }
+        .btn-logout { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+        /* Marquee */
+        .marquee-container { background: #1e293b; color: #fbbf24; padding: 8px 15px; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+        .marquee-content { display: inline-block; animation: scrollText 15s linear infinite; }
+        @keyframes scrollText { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .wallet-card { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .wallet-card h3 { font-size: 14px; color: #64748b; }
-        .wallet-card .balance { font-size: 30px; font-weight: 800; color: var(--primary); }
+        .wallet-card { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid #edf2f7; }
+        .balance { font-size: 32px; font-weight: 800; color: var(--primary); }
 
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .status-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; }
-        .status-box p { font-weight: 700; color: var(--primary); }
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .status-box { background: var(--white); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #edf2f7; }
+        .status-box h4 { font-size: 11px; color: #94a3b8; margin-bottom: 5px; }
+        .status-box p { font-weight: 700; font-size: 15px; }
 
+        /* Wheel UI */
         .wheel-container { position: relative; width: 280px; height: 280px; margin: 20px auto; }
         .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 5; color: #ef4444; font-size: 35px; }
         .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.1); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); background: conic-gradient(#f87171 0 60deg, #fbbf24 60deg 120deg, #34d399 120deg 180deg, #60a5fa 180deg 240deg, #a78bfa 240deg 300deg, #f472b6 300deg 360deg); }
         .wheel-labels { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
         .label { position: absolute; top: 0; left: 50%; width: 50px; height: 50%; transform-origin: 50% 100%; text-align: center; padding-top: 15px; font-weight: 800; color: white; margin-left: -25px; }
 
-        .spin-btn { width: 100%; padding: 15px; border-radius: 12px; background: var(--primary); color: white; border: none; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
-        .spin-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+        .spin-btn { width: 100%; padding: 16px; border-radius: 12px; background: var(--primary); color: white; border: none; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .spin-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        .history-card { margin-top: 25px; background: var(--white); padding: 15px; border-radius: 15px; }
-        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f1f5f9; font-size: 14px; }
-        
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #334155; color: white; padding: 10px 20px; border-radius: 30px; transition: 0.4s; opacity: 0; z-index: 100; }
+        /* History */
+        .history-card { margin-top: 30px; background: var(--white); padding: 15px; border-radius: 15px; border: 1px solid #edf2f7; }
+        .history-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+        .serial-badge { background: var(--primary); color: white; min-width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .history-info { flex-grow: 1; margin: 0 12px; }
+        .history-time { font-size: 11px; color: #64748b; margin-top: 2px; display: block; }
+        .history-amount { font-weight: 800; color: #10b981; }
+
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #334155; color: white; padding: 12px 25px; border-radius: 30px; transition: 0.4s; opacity: 0; z-index: 1000; font-size: 14px; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
@@ -57,34 +73,46 @@
 
     <div id="loginScreen">
         <div class="login-box">
-            <h2>লগইন করুন</h2>
+            <h2>লগইন প্যানেল</h2>
             <div class="input-group">
                 <label>ইমেইল অ্যাড্রেস</label>
-                <input type="email" id="loginEmail" placeholder="example@mail.com">
+                <input type="email" id="loginEmail" placeholder="আপনার ইমেইল">
             </div>
             <div class="input-group">
                 <label>পাসওয়ার্ড</label>
                 <input type="password" id="loginPass" placeholder="******">
             </div>
-            <button class="login-btn" onclick="handleLogin()">লগইন</button>
+            <button class="login-btn" id="loginSubmitBtn" onclick="handleLogin()">লগইন করুন</button>
         </div>
     </div>
 
     <div id="spinScreen">
+        <div class="top-user-bar">
+            <div class="user-meta">
+                <i class="fas fa-user-circle" style="color:var(--primary); font-size:18px;"></i>
+                <span id="displayUserEmail">লোড হচ্ছে...</span>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">লগ আউট</button>
+        </div>
+
+        <div class="marquee-container">
+            <span class="marquee-content" id="scrollingText">লোড হচ্ছে...</span>
+        </div>
+
         <div class="container">
             <div class="wallet-card">
-                <h3>স্পিন ওয়ালেট ব্যালেন্স</h3>
+                <p style="font-size: 12px; color: #64748b;">ওয়ালেট ব্যালেন্স</p>
                 <div class="balance">৳<span id="spinBal">0.00</span></div>
             </div>
 
             <div class="status-grid">
                 <div class="status-box">
-                    <h3>আজকের স্পিন</h3>
+                    <h4>আজকের স্পিন</h4>
                     <p><span id="countToday">0</span> / <span id="limitTotal">0</span></p>
                 </div>
                 <div class="status-box">
-                    <h3>পরবর্তী স্পিন</h3>
-                    <p id="timerText">প্রস্তুত</p>
+                    <h4>পরবর্তী স্পিন</h4>
+                    <p id="timerText">--:--</p>
                 </div>
             </div>
 
@@ -98,7 +126,7 @@
             <button id="spinBtn" class="spin-btn" onclick="startSpinAction()">স্পিন করুন</button>
 
             <div class="history-card">
-                <h2 style="font-size: 16px; margin-bottom: 10px;">সাম্প্রতিক হিস্ট্রি</h2>
+                <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--primary);">সাম্প্রতিক স্পিন হিস্ট্রি</h3>
                 <div id="historyList"></div>
             </div>
         </div>
@@ -107,7 +135,6 @@
     <div id="toast"></div>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBY2R6jBre2pjrW3cN0QP8LGrLldgKWEtc",
             authDomain: "smartpay-4cae4.firebaseapp.com",
@@ -122,10 +149,10 @@
 
         let uid = null, config = null, isSpinning = false, lastSpin = null, todayCount = 0;
 
-        // Auth Logic
         auth.onAuthStateChanged(user => {
             if (user) {
                 uid = user.uid;
+                document.getElementById('displayUserEmail').innerText = user.email;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('spinScreen').style.display = 'block';
                 initApp();
@@ -139,19 +166,19 @@
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
             if(!email || !pass) return showToast("সব তথ্য দিন");
-            
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch(err => showToast("লগইন ব্যর্থ: তথ্য চেক করুন"));
+            auth.signInWithEmailAndPassword(email, pass).catch(() => showToast("লগইন ব্যর্থ!"));
         }
 
-        function handleLogout() { auth.signOut(); }
+        function handleLogout() {
+            if(confirm("আপনি কি লগ আউট করতে চান?")) auth.signOut();
+        }
 
-        // App Logic
         async function initApp() {
             db.collection('spin_settings').doc('config').onSnapshot(doc => {
                 config = doc.data();
+                document.getElementById('scrollingText').innerText = config.scrollingText || "Welcome!";
                 renderLabels();
-                syncData();
+                syncUserData();
             });
         }
 
@@ -164,45 +191,52 @@
             });
         }
 
-        function syncData() {
-            // Balance
+        function syncUserData() {
             db.collection('users').doc(uid).onSnapshot(doc => {
-                const data = doc.data() || {};
-                document.getElementById('spinBal').innerText = (data.spinWallet || 0).toFixed(2);
+                document.getElementById('spinBal').innerText = (doc.data()?.spinWallet || 0).toFixed(2);
             });
 
-            // History
-            const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
-            db.collection('users').doc(uid).collection('spin_history')
-              .orderBy('createdAt', 'desc').onSnapshot(snap => {
-                  let html = '', count = 0;
-                  if (!snap.empty) lastSpin = snap.docs[0].data().createdAt?.toDate();
-                  snap.forEach(doc => {
-                      const d = doc.data();
-                      const date = d.createdAt?.toDate() || new Date();
-                      if (date >= startOfToday) count++;
-                      html += `<div class="history-item"><span>বক্স ${d.boxIndex}</span><span style="color:#10b981; font-weight:700">+৳${d.amount}</span></div>`;
-                  });
-                  todayCount = count;
-                  document.getElementById('countToday').innerText = count;
-                  document.getElementById('historyList').innerHTML = html || '<p style="text-align:center;">রেকর্ড নেই</p>';
-                  checkConstraints();
-              });
+            const today = new Date(); today.setHours(0,0,0,0);
+            db.collection('users').doc(uid).collection('spin_history').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                let html = '', count = 0, serial = 1;
+                if (!snap.empty) lastSpin = snap.docs[0].data().createdAt?.toDate();
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const date = d.createdAt?.toDate() || new Date();
+                    if (date >= today) count++;
+                    
+                    // তারিখ এবং সময় ফরম্যাট (DD/MM/YYYY | HH:MM AM/PM)
+                    const dateTimeStr = date.toLocaleString('en-GB', { 
+                        timeZone: 'Asia/Dhaka', 
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true 
+                    }).replace(',', ' |');
+
+                    html += `<div class="history-item">
+                        <div class="serial-badge">${serial++}</div>
+                        <div class="history-info">
+                            <b>বক্স ${d.boxIndex}</b>
+                            <span class="history-time">${dateTimeStr}</span>
+                        </div>
+                        <div class="history-amount">+৳${d.amount}</div>
+                    </div>`;
+                });
+                todayCount = count;
+                document.getElementById('countToday').innerText = count;
+                document.getElementById('historyList').innerHTML = html || '<p style="text-align:center; padding:10px; font-size:12px;">রেকর্ড নেই</p>';
+                checkEligibility();
+            });
         }
 
-        function checkConstraints() {
+        function checkEligibility() {
             if (isSpinning) return;
             const btn = document.getElementById('spinBtn');
             document.getElementById('limitTotal').innerText = config.dailyLimit;
-
-            if (!config.isActive) { btn.disabled = true; btn.innerText = "মেইনটেন্যান্স"; return; }
+            if (!config.isActive) { btn.disabled = true; btn.innerText = "বন্ধ"; return; }
             if (todayCount >= config.dailyLimit) { btn.disabled = true; btn.innerText = "লিমিট শেষ"; return; }
-
             if (lastSpin) {
-                const wait = config.spinIntervalHours * 3600000;
-                const next = lastSpin.getTime() + wait;
-                const diff = next - Date.now();
-                if (diff > 0) { btn.disabled = true; startTimer(next); return; }
+                const next = lastSpin.getTime() + (config.spinIntervalHours * 3600000);
+                if (next > Date.now()) { btn.disabled = true; startTimer(next); return; }
             }
             btn.disabled = false; btn.innerText = "স্পিন করুন";
             document.getElementById('timerText').innerText = "প্রস্তুত";
@@ -211,10 +245,10 @@
         function startTimer(target) {
             const itv = setInterval(() => {
                 const diff = target - Date.now();
-                if (diff <= 0) { clearInterval(itv); checkConstraints(); }
+                if (diff <= 0) { clearInterval(itv); checkEligibility(); }
                 else {
                     const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-                    document.getElementById('timerText').innerText = `${h}ঘ ${m}মি ${s}সে`;
+                    document.getElementById('timerText').innerText = `${h}h ${m}m ${s}s`;
                 }
             }, 1000);
         }
@@ -222,26 +256,21 @@
         async function startSpinAction() {
             if (isSpinning) return;
             isSpinning = true; document.getElementById('spinBtn').disabled = true;
-
             const rand = Math.random() * 100;
             let cumulative = 0, winner = config.wheel.boxes[0];
             for (let box of config.wheel.boxes) {
                 cumulative += box.probability;
                 if (rand < cumulative) { winner = box; break; }
             }
-
-            const boxIdx = winner.index - 1;
-            const totalDeg = (360 * 5) + (360 - (boxIdx * 60)) - 30;
-            const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${totalDeg}deg)`;
-
+            const totalDeg = (360 * 5) + (360 - ((winner.index-1) * 60)) - 30;
+            document.getElementById('wheel').style.transform = `rotate(${totalDeg}deg)`;
             setTimeout(async () => {
                 await processReward(winner);
-                showToast(`অভিনন্দন! আপনি জিতেছেন ৳${winner.amount}`);
+                showToast(`জিতেছেন ৳${winner.amount}`);
                 isSpinning = false;
-                wheel.style.transition = 'none';
-                wheel.style.transform = `rotate(${totalDeg % 360}deg)`;
-                setTimeout(() => wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.15, 1)', 50);
+                document.getElementById('wheel').style.transition = 'none';
+                document.getElementById('wheel').style.transform = `rotate(${totalDeg % 360}deg)`;
+                setTimeout(() => document.getElementById('wheel').style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.15, 1)', 50);
             }, 4200);
         }
 
