@@ -266,7 +266,7 @@
             document.getElementById('wheel').style.transform = `rotate(${totalDeg}deg)`;
             setTimeout(async () => {
                 await processReward(winner);
-                showToast(`জিতেছেন ৳${winner.amount}`);
+                showToast(`আপনি জিতেছেন SmartPay Wallet এর Spin থেকে  ৳${winner.amount}`);
                 isSpinning = false;
                 document.getElementById('wheel').style.transition = 'none';
                 document.getElementById('wheel').style.transform = `rotate(${totalDeg % 360}deg)`;
