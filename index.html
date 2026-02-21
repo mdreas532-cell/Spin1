@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartPay - লাকি স্পিন</title>
+    <title>SmartPay - লগইন ও স্পিন</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -14,68 +14,59 @@
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --white: #ffffff; --text: #0f172a; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); }
 
-        /* Loading Screen */
-        #loadingScreen { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-
-        /* Login Screen */
-        #loginScreen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        /* Login Screen Styles */
+        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
         .login-box { background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; }
         .login-box h2 { text-align: center; margin-bottom: 25px; color: var(--primary); }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
         .input-group input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 16px; outline: none; }
-        .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; }
 
-        /* Spin Screen */
+        /* Spin Screen Styles */
         #spinScreen { display: none; }
+
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .wallet-card { background: var(--white); padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf2f7; }
-        .wallet-card h3 { font-size: 14px; color: #64748b; margin-bottom: 5px; }
-        .wallet-card .balance { font-size: 32px; font-weight: 800; color: var(--primary); }
+        .wallet-card { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .wallet-card h3 { font-size: 14px; color: #64748b; }
+        .wallet-card .balance { font-size: 30px; font-weight: 800; color: var(--primary); }
 
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .status-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #edf2f7; }
-        .status-box h4 { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
-        .status-box p { font-weight: 700; color: var(--text); font-size: 16px; }
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .status-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; }
+        .status-box p { font-weight: 700; color: var(--primary); }
 
-        /* Wheel UI */
-        .wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
-        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 5; color: #ef4444; font-size: 40px; }
-        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid white; box-shadow: 0 0 25px rgba(0,0,0,0.1); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); background: conic-gradient(#f87171 0 60deg, #fbbf24 60deg 120deg, #34d399 120deg 180deg, #60a5fa 180deg 240deg, #a78bfa 240deg 300deg, #f472b6 300deg 360deg); }
+        .wheel-container { position: relative; width: 280px; height: 280px; margin: 20px auto; }
+        .pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 5; color: #ef4444; font-size: 35px; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.1); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); background: conic-gradient(#f87171 0 60deg, #fbbf24 60deg 120deg, #34d399 120deg 180deg, #60a5fa 180deg 240deg, #a78bfa 240deg 300deg, #f472b6 300deg 360deg); }
         .wheel-labels { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
-        .label { position: absolute; top: 0; left: 50%; width: 50px; height: 50%; transform-origin: 50% 100%; text-align: center; padding-top: 20px; font-weight: 800; color: white; margin-left: -25px; font-size: 18px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .label { position: absolute; top: 0; left: 50%; width: 50px; height: 50%; transform-origin: 50% 100%; text-align: center; padding-top: 15px; font-weight: 800; color: white; margin-left: -25px; }
 
-        .spin-btn { width: 100%; padding: 18px; border-radius: 15px; background: var(--primary); color: white; border: none; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); transition: 0.3s; }
-        .spin-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: scale(0.98); }
+        .spin-btn { width: 100%; padding: 15px; border-radius: 12px; background: var(--primary); color: white; border: none; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+        .spin-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
 
-        .history-card { margin-top: 30px; background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .history-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #f1f5f9; font-size: 15px; }
-        .history-item:last-child { border: none; }
+        .history-card { margin-top: 25px; background: var(--white); padding: 15px; border-radius: 15px; }
+        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f1f5f9; font-size: 14px; }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 25px; border-radius: 30px; transition: 0.4s; opacity: 0; z-index: 1000; font-weight: 500; }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #334155; color: white; padding: 10px 20px; border-radius: 30px; transition: 0.4s; opacity: 0; z-index: 100; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div id="loadingScreen">
-        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
-    </div>
-
     <div id="loginScreen">
         <div class="login-box">
-            <h2>লগইন প্যানেল</h2>
+            <h2>লগইন করুন</h2>
             <div class="input-group">
-                <label>ইমেইল এড্রেস</label>
-                <input type="email" id="loginEmail" placeholder="আপনার ইমেইল দিন">
+                <label>ইমেইল অ্যাড্রেস</label>
+                <input type="email" id="loginEmail" placeholder="example@mail.com">
             </div>
             <div class="input-group">
                 <label>পাসওয়ার্ড</label>
                 <input type="password" id="loginPass" placeholder="******">
             </div>
-            <button class="login-btn" id="loginSubmitBtn" onclick="handleLogin()">লগইন করুন</button>
+            <button class="login-btn" onclick="handleLogin()">লগইন</button>
         </div>
     </div>
 
@@ -88,12 +79,12 @@
 
             <div class="status-grid">
                 <div class="status-box">
-                    <h4>আজকের লিমিট</h4>
+                    <h3>আজকের স্পিন</h3>
                     <p><span id="countToday">0</span> / <span id="limitTotal">0</span></p>
                 </div>
                 <div class="status-box">
-                    <h4>পরবর্তী স্পিন</h4>
-                    <p id="timerText">অপেক্ষা করুন...</p>
+                    <h3>পরবর্তী স্পিন</h3>
+                    <p id="timerText">প্রস্তুত</p>
                 </div>
             </div>
 
@@ -107,7 +98,7 @@
             <button id="spinBtn" class="spin-btn" onclick="startSpinAction()">স্পিন করুন</button>
 
             <div class="history-card">
-                <h2 style="font-size: 17px; margin-bottom: 15px; color: var(--primary);"><i class="fas fa-history"></i> স্পিন হিস্ট্রি</h2>
+                <h2 style="font-size: 16px; margin-bottom: 10px;">সাম্প্রতিক হিস্ট্রি</h2>
                 <div id="historyList"></div>
             </div>
         </div>
@@ -116,7 +107,7 @@
     <div id="toast"></div>
 
     <script>
-        // Firebase Configuration
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBY2R6jBre2pjrW3cN0QP8LGrLldgKWEtc",
             authDomain: "smartpay-4cae4.firebaseapp.com",
@@ -131,48 +122,36 @@
 
         let uid = null, config = null, isSpinning = false, lastSpin = null, todayCount = 0;
 
-        // --- AUTH PERSISTENCE LOGIC ---
+        // Auth Logic
         auth.onAuthStateChanged(user => {
-            const loading = document.getElementById('loadingScreen');
-            const loginUI = document.getElementById('loginScreen');
-            const spinUI = document.getElementById('spinScreen');
-
             if (user) {
                 uid = user.uid;
-                loginUI.style.display = 'none';
-                spinUI.style.display = 'block';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('spinScreen').style.display = 'block';
                 initApp();
             } else {
-                loginUI.style.display = 'flex';
-                spinUI.style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('spinScreen').style.display = 'none';
             }
-            loading.style.display = 'none';
         });
 
         function handleLogin() {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            const btn = document.getElementById('loginSubmitBtn');
-
-            if(!email || !pass) return showToast("সব ঘর পূরণ করুন!");
+            if(!email || !pass) return showToast("সব তথ্য দিন");
             
-            btn.disabled = true;
-            btn.innerText = "অপেক্ষা করুন...";
-
             auth.signInWithEmailAndPassword(email, pass)
-                .catch(err => {
-                    showToast("ভুল ইমেইল বা পাসওয়ার্ড!");
-                    btn.disabled = false;
-                    btn.innerText = "লগইন করুন";
-                });
+                .catch(err => showToast("লগইন ব্যর্থ: তথ্য চেক করুন"));
         }
 
-        // --- CORE SPIN APP LOGIC ---
+        function handleLogout() { auth.signOut(); }
+
+        // App Logic
         async function initApp() {
             db.collection('spin_settings').doc('config').onSnapshot(doc => {
                 config = doc.data();
                 renderLabels();
-                syncUserData();
+                syncData();
             });
         }
 
@@ -185,75 +164,55 @@
             });
         }
 
-        function syncUserData() {
-            // Real-time Balance
+        function syncData() {
+            // Balance
             db.collection('users').doc(uid).onSnapshot(doc => {
                 const data = doc.data() || {};
                 document.getElementById('spinBal').innerText = (data.spinWallet || 0).toFixed(2);
             });
 
-            // Today's History and Counter
-            const today = new Date(); today.setHours(0,0,0,0);
+            // History
+            const startOfToday = new Date(); startOfToday.setHours(0,0,0,0);
             db.collection('users').doc(uid).collection('spin_history')
               .orderBy('createdAt', 'desc').onSnapshot(snap => {
                   let html = '', count = 0;
                   if (!snap.empty) lastSpin = snap.docs[0].data().createdAt?.toDate();
-                  
                   snap.forEach(doc => {
                       const d = doc.data();
                       const date = d.createdAt?.toDate() || new Date();
-                      if (date >= today) count++;
-                      html += `<div class="history-item">
-                                 <span>বক্স ${d.boxIndex} (${date.toLocaleTimeString('bn-BD')})</span>
-                                 <span style="color:#10b981; font-weight:700">+৳${d.amount}</span>
-                               </div>`;
+                      if (date >= startOfToday) count++;
+                      html += `<div class="history-item"><span>বক্স ${d.boxIndex}</span><span style="color:#10b981; font-weight:700">+৳${d.amount}</span></div>`;
                   });
                   todayCount = count;
                   document.getElementById('countToday').innerText = count;
-                  document.getElementById('historyList').innerHTML = html || '<p style="text-align:center; padding:10px;">কোনো ইতিহাস নেই</p>';
-                  checkEligibility();
+                  document.getElementById('historyList').innerHTML = html || '<p style="text-align:center;">রেকর্ড নেই</p>';
+                  checkConstraints();
               });
         }
 
-        function checkEligibility() {
+        function checkConstraints() {
             if (isSpinning) return;
             const btn = document.getElementById('spinBtn');
             document.getElementById('limitTotal').innerText = config.dailyLimit;
 
-            if (!config.isActive) { 
-                btn.disabled = true; 
-                btn.innerText = "মেইনটেন্যান্স চলছে"; 
-                return; 
-            }
-            
-            if (todayCount >= config.dailyLimit) { 
-                btn.disabled = true; 
-                btn.innerText = "আজকের লিমিট শেষ"; 
-                return; 
-            }
+            if (!config.isActive) { btn.disabled = true; btn.innerText = "মেইনটেন্যান্স"; return; }
+            if (todayCount >= config.dailyLimit) { btn.disabled = true; btn.innerText = "লিমিট শেষ"; return; }
 
             if (lastSpin) {
-                const waitTime = config.spinIntervalHours * 3600000;
-                const nextTime = lastSpin.getTime() + waitTime;
-                const diff = nextTime - Date.now();
-                if (diff > 0) { 
-                    btn.disabled = true; 
-                    startTimer(nextTime); 
-                    return; 
-                }
+                const wait = config.spinIntervalHours * 3600000;
+                const next = lastSpin.getTime() + wait;
+                const diff = next - Date.now();
+                if (diff > 0) { btn.disabled = true; startTimer(next); return; }
             }
-            btn.disabled = false; 
-            btn.innerText = "স্পিন করুন";
+            btn.disabled = false; btn.innerText = "স্পিন করুন";
             document.getElementById('timerText').innerText = "প্রস্তুত";
         }
 
         function startTimer(target) {
             const itv = setInterval(() => {
                 const diff = target - Date.now();
-                if (diff <= 0) { 
-                    clearInterval(itv); 
-                    checkEligibility(); 
-                } else {
+                if (diff <= 0) { clearInterval(itv); checkConstraints(); }
+                else {
                     const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
                     document.getElementById('timerText').innerText = `${h}ঘ ${m}মি ${s}সে`;
                 }
@@ -262,10 +221,8 @@
 
         async function startSpinAction() {
             if (isSpinning) return;
-            isSpinning = true; 
-            document.getElementById('spinBtn').disabled = true;
+            isSpinning = true; document.getElementById('spinBtn').disabled = true;
 
-            // Pick Winner Logic
             const rand = Math.random() * 100;
             let cumulative = 0, winner = config.wheel.boxes[0];
             for (let box of config.wheel.boxes) {
@@ -280,7 +237,7 @@
 
             setTimeout(async () => {
                 await processReward(winner);
-                showToast(`অভিনন্দন! আপনি ৳${winner.amount} জিতেছেন`);
+                showToast(`অভিনন্দন! আপনি জিতেছেন ৳${winner.amount}`);
                 isSpinning = false;
                 wheel.style.transition = 'none';
                 wheel.style.transform = `rotate(${totalDeg % 360}deg)`;
@@ -291,17 +248,11 @@
         async function processReward(box) {
             const userRef = db.collection('users').doc(uid);
             const histRef = userRef.collection('spin_history').doc();
-            
             await db.runTransaction(async (t) => {
                 const doc = await t.get(userRef);
                 const curBal = (doc.exists ? doc.data().spinWallet : 0) || 0;
                 t.set(userRef, { spinWallet: curBal + box.amount }, { merge: true });
-                t.set(histRef, { 
-                    boxIndex: box.index, 
-                    amount: box.amount, 
-                    probability: box.probability, 
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-                });
+                t.set(histRef, { boxIndex: box.index, amount: box.amount, probability: box.probability, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
             });
         }
 
